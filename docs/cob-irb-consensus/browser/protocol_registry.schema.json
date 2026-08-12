@@ -1,0 +1,79 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "cob-irb-protocol-registry.schema.json",
+  "title": "CoB IRB Protocol Registry",
+  "description": "Public schema only. Live registries are Internal and stay on CoB IRB Google Drive. Rows are never deleted — use status archived and change_log.",
+  "type": "object",
+  "required": ["version", "updated_at", "protocols"],
+  "properties": {
+    "version": { "type": "integer", "const": 1 },
+    "updated_at": { "type": "string", "format": "date" },
+    "retention_policy": {
+      "type": "string",
+      "const": "no_delete_update_only",
+      "description": "Hard rule: never remove protocols or permanently delete Drive snapshots."
+    },
+    "citi_folder_url": {
+      "type": "string",
+      "description": "Nicholls Drive folder for investigator CITI PDFs (Confidential)."
+    },
+    "protocols": {
+      "type": "array",
+      "items": {
+        "type": "object",
+        "required": [
+          "protocol_id",
+          "short_title",
+          "study_context",
+          "approval_date",
+          "renewal_due_date",
+          "status"
+        ],
+        "properties": {
+          "protocol_id": { "type": "string" },
+          "short_title": { "type": "string" },
+          "study_context": {
+            "type": "string",
+            "enum": ["social_behavioral", "biomedical_clinical", "mixed_other"]
+          },
+          "approval_date": { "type": "string", "format": "date" },
+          "renewal_due_date": { "type": "string", "format": "date" },
+          "status": { "type": "string", "enum": ["active", "archived"] },
+          "pi_display": { "type": "string" },
+          "notes": { "type": "string" },
+          "investigators": {
+            "type": "array",
+            "items": {
+              "type": "object",
+              "required": ["name_display", "role", "citi_on_drive"],
+              "properties": {
+                "name_display": { "type": "string" },
+                "role": { "type": "string", "enum": ["pi", "co_i"] },
+                "citi_on_drive": { "type": "boolean" },
+                "citi_expiration_date": { "type": ["string", "null"], "format": "date" },
+                "citi_notes": { "type": "string" }
+              },
+              "additionalProperties": false
+            }
+          },
+          "change_log": {
+            "type": "array",
+            "description": "Append-only history. Never delete entries.",
+            "items": {
+              "type": "object",
+              "required": ["date", "summary"],
+              "properties": {
+                "date": { "type": "string", "format": "date" },
+                "summary": { "type": "string" },
+                "by": { "type": "string" }
+              },
+              "additionalProperties": false
+            }
+          }
+        },
+        "additionalProperties": false
+      }
+    }
+  },
+  "additionalProperties": false
+}

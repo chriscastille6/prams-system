@@ -1,0 +1,76 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>Diagram 1 — Which standards apply?</title>
+  <link rel="stylesheet" href="shared.css">
+  <style>
+    body { font-family: system-ui, sans-serif; }
+    .wrap-wide { max-width: 96rem; }
+    .diagram-wrap { overflow-x: auto; overflow-y: visible; background: #fff; border: 1px solid var(--border); border-radius: 8px; padding: 1rem; }
+    .diagram-wrap .mermaid { width: 100%; }
+    .diagram-wrap .mermaid svg { width: 100% !important; max-width: 100% !important; min-width: 3200px; height: auto; }
+  </style>
+</head>
+<body>
+  <nav class="site-nav" aria-label="Primary">
+    <span class="brand">CoB IRB</span>
+    <a href="index.html">Home</a>
+    <a href="standards.html">Standards</a>
+    <a href="process.html">Process</a>
+    <a href="consensus-checklist.html">Checklist</a>
+    <a href="registry.html">Registry</a>
+    <a href="retention.html">Retention</a>
+    <a href="qualtrics-guide.html">Qualtrics</a>
+  </nav>
+  <main class="wrap wrap-wide">
+    <p class="nav muted"><a href="standards.html">← Social Science IRB Standards</a></p>
+    <h1>Diagram 1: Which standards apply?</h1>
+    <p class="muted">Expanded large-format rendering (scroll horizontally if needed). Internet required for Mermaid CDN.</p>
+    <div class="diagram-wrap">
+      <div class="mermaid">
+flowchart TD
+    start["Study submitted or reviewed for CoB HSIRB"] --> studyType{"Primarily social or behavioral research?"}
+    studyType -->|"Yes"| socialPath["Apply proportional social and behavioral standards"]
+    studyType -->|"No"| standardPath["Apply standard IRB framework and HSIRB review pathway"]
+
+    socialPath --> riskLens["Risk: assess psychological, social, reputational, legal, and community harms; do not infer biomedical risk when none exists"]
+    socialPath --> consentLens["Consent: choose written, verbal, process, or community-appropriate consent that fits the method and population"]
+    socialPath --> deviationLens["Changes: distinguish emergent methodological adaptation from true noncompliance"]
+
+    riskLens --> minimalRisk{"Are risks no greater than daily life or routine educational or occupational activities?"}
+    minimalRisk -->|"Yes"| proportionalReview["Use proportionate scrutiny and minimal-risk safeguards"]
+    minimalRisk -->|"No"| elevatedReview["Escalate review and add targeted protections"]
+
+    consentLens --> consentFit{"Does the consent approach match literacy, language, culture, and study design?"}
+    consentFit -->|"Yes"| consentOkay["Autonomy is protected without unnecessary exclusion"]
+    consentFit -->|"No"| consentRevise["Revise the consent model or justify an alternative approach"]
+
+    deviationLens --> changeType{"Is the change necessary for valid and responsive social research?"}
+    changeType -->|"Yes"| documentAdaptation["Document the rationale and submit an update or amendment as needed"]
+    changeType -->|"No"| correctiveAction["Treat as a protocol deviation requiring corrective action"]
+
+    standardPath --> hsirbReview["Use exempt, expedited, or full HSIRB workflow"]
+      </div>
+    </div>
+  </main>
+  <script type="module">
+    import mermaid from "https://cdn.jsdelivr.net/npm/mermaid@11/dist/mermaid.esm.min.mjs";
+    mermaid.initialize({
+      startOnLoad: true,
+      securityLevel: "strict",
+      theme: "default",
+      themeVariables: { fontSize: "42px" },
+      flowchart: {
+        useMaxWidth: true,
+        htmlLabels: true,
+        wrappingWidth: 1100,
+        nodeSpacing: 200,
+        rankSpacing: 260,
+        padding: 72
+      }
+    });
+  </script>
+</body>
+</html>

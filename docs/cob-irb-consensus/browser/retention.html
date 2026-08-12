@@ -1,0 +1,49 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>No-delete retention — CoB IRB</title>
+  <link rel="stylesheet" href="shared.css">
+</head>
+<body>
+  <nav class="site-nav" aria-label="Primary">
+    <span class="brand">CoB IRB</span>
+    <a href="index.html">Home</a>
+    <a href="standards.html">Standards</a>
+    <a href="process.html">Process</a>
+    <a href="consensus-checklist.html">Checklist</a>
+    <a href="registry.html">Registry</a>
+    <a href="retention.html">Retention</a>
+    <a href="qualtrics-guide.html">Qualtrics</a>
+  </nav>
+  <main class="wrap">
+    <p class="banner" style="border-color:#8b1a1a;background:#fde8e8;"><strong>Hard-coded rule:</strong> No files are to be deleted under any circumstances. Update, supersede, and archive with dated change notes so CoB IRB can always find prior materials.</p>
+
+    <h1>Retention — update, do not delete</h1>
+
+    <h2>Why</h2>
+    <p>IRB work depends on being able to reconstruct what was approved, when it changed, and what replaced it. Permanent deletion puts representatives in a position where they cannot find their materials.</p>
+
+    <h2>Per-project Drive pattern</h2>
+    <pre style="background:#fff;border:1px solid var(--border);padding:0.85rem;overflow:auto;font-size:0.85rem;"><code>{protocol_id}/
+  UPDATE_LOG.md          ← running log (append only)
+  CURRENT/               ← latest files
+  _archive/
+    YYYY-MM-DD_label/
+      CHANGE_NOTE.md     ← what changed, when, who
+      …prior files…</code></pre>
+
+    <h2>Allowed vs forbidden</h2>
+    <ul class="guidance">
+      <li><strong>Allowed:</strong> add files; move old versions into `_archive/`; edit registry metadata; mark protocols <em>archived</em> (row retained); export dated registry snapshots.</li>
+      <li><strong>Forbidden:</strong> Trash / permanent delete of CoB HSIRB Drive files; removing protocol rows from the registry JSON; emptying Drive Trash for these materials.</li>
+    </ul>
+
+    <h2>Registry tool</h2>
+    <p>The <a href="registry.html">protocol registry</a> has no Delete control. Saves append a <code>change_log</code> entry. Export offers a current file and a dated snapshot for Drive <code>03_Protocol_Registry/_archive/</code>.</p>
+
+    <p class="source">Full text: <code>docs/cob-irb-consensus/NO_DELETE_RETENTION.md</code> · Templates: <code>templates/project_UPDATE_LOG_template.md</code>, <code>templates/CHANGE_NOTE_template.md</code></p>
+  </main>
+</body>
+</html>

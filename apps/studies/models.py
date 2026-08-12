@@ -136,6 +136,17 @@ class Study(models.Model):
     osf_enabled = models.BooleanField(default=False, help_text="Project is on Open Science Framework")
     osf_project_id = models.CharField(max_length=100, blank=True, help_text="OSF project identifier")
     osf_link = models.URLField(blank=True, help_text="Full OSF project URL")
+
+    # Nicholls Google Drive materials (Phase 1: deep link only; no file blobs in git)
+    drive_folder_url = models.URLField(
+        blank=True,
+        help_text="Nicholls Google Drive folder for study/protocol materials (packets, CITI, consents)",
+    )
+    drive_folder_id = models.CharField(
+        max_length=128,
+        blank=True,
+        help_text="Google Drive folder id (optional; used with drive_folder_url)",
+    )
     
     # Analysis and monitoring fields
     min_sample_size = models.IntegerField(
@@ -258,6 +269,28 @@ class Study(models.Model):
         if latest.minor_issues:
             return 'minor_issues'
         return 'clear'
+
+    @property
+    def irb_expiration_days(self):
+        """Days until IRB expiration (negative if overdue). None if unset."""
+        if not self.irb_expiration:
+            return None
+        return (self.irb_expiration - timezone.now().date()).days
+
+    @property
+    def irb_expiration_band(self):
+        """
+        Renewal warning band aligned with CoB browser registry:
+        green >30 days; yellow ≤30 days; red overdue.
+        """
+        days = self.irb_expiration_days
+        if days is None:
+            return None
+        if days < 0:
+            return 'red'
+        if days <= 30:
+            return 'yellow'
+        return 'green'
     
     def is_assigned_reviewer(self, user):
         """Check whether the user is an assigned IRB reviewer for this study."""

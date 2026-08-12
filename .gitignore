@@ -58,3 +58,13 @@ docs/_build/
 # Node (for scripts/generate_irb_briefing_pdf.js)
 node_modules/
 scripts/node_modules/
+
+# Local Netlify folder
+.netlify
+
+# Confidential CITI / PI date artifacts (keep on Drive, not GitHub)
+docs/citi*.pdf
+docs/citi_pi_dates.txt
+**/hsirb_amendment_*/CITI/*.pdf
+**/CITI/*citiCompletion*.pdf
+**/CITI/*citiCompletionReport*.pdf

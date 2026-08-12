@@ -1,0 +1,78 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>CoB IRB Consensus Checklist</title>
+  <link rel="stylesheet" href="shared.css">
+</head>
+<body>
+  <nav class="site-nav" aria-label="Primary">
+    <span class="brand">CoB IRB</span>
+    <a href="index.html">Home</a>
+    <a href="standards.html">Standards</a>
+    <a href="process.html">Process</a>
+    <a href="consensus-checklist.html">Checklist</a>
+    <a href="registry.html">Registry</a>
+    <a href="retention.html">Retention</a>
+    <a href="qualtrics-guide.html">Qualtrics</a>
+  </nav>
+  <main class="wrap">
+    <p class="banner">Interactive checklist for CoB IRB representatives. Checks stay in this browser session only (not saved to a server). Use Drive minutes to record consensus. Companion diagram: <a href="diagram_2.html">Diagram 2</a>.</p>
+
+    <h1>Consensus checklist</h1>
+    <p class="muted">For social and behavioral protocols. Medical/clinical defaults do not auto-apply.</p>
+
+    <form class="checklist" id="checklist">
+      <h2>1. Context</h2>
+      <label><input type="checkbox" name="c1"> Study context identified (survey, interview, classroom, qualitative, digital, mixed, etc.)</label>
+      <label><input type="checkbox" name="c2"> Primary study context noted: social_behavioral / biomedical_clinical / mixed_other</label>
+      <label><input type="checkbox" name="c3"> If social_behavioral, Social Science IRB Standards are the default lens</label>
+
+      <h2>2. Risk in context</h2>
+      <label><input type="checkbox" name="r1"> Risks assessed are those the protocol actually creates (psychological, social, reputational, legal, community — not inferred biomedical risk)</label>
+      <label><input type="checkbox" name="r2"> Minimal-risk claim is justified against daily life or routine educational/occupational activities for this population</label>
+      <label><input type="checkbox" name="r3"> If not minimal risk, concrete added protections are specified</label>
+
+      <h2>3. Consent fit</h2>
+      <label><input type="checkbox" name="n1"> Consent model fits method and population (written is one option, not always required)</label>
+      <label><input type="checkbox" name="n2"> Clarity, voluntariness, and comprehension are adequate</label>
+      <label><input type="checkbox" name="n3"> Right to withdraw and alternatives (e.g., course credit alternate) are clear when applicable</label>
+
+      <h2>4. Adaptation vs noncompliance</h2>
+      <label><input type="checkbox" name="a1"> Iterative/emergent designs (if any) are bounded and documentation/reporting plans are clear</label>
+      <label><input type="checkbox" name="a2"> Distinguishes justified methodological adaptation from protocol deviation / noncompliance</label>
+
+      <h2>5. Operations (not AEs)</h2>
+      <label><input type="checkbox" name="o1"> Data-collection / Qualtrics instrument role is described; responses stay with PI Qualtrics</label>
+      <label><input type="checkbox" name="o2"> Reviewers are not treating convenience sampling alone as an ethical barrier for minimal-risk work</label>
+      <label><input type="checkbox" name="o3"> Course credit (if any) is instructor-owned; voluntariness and alternatives documented</label>
+
+      <h2>6. Decision</h2>
+      <label><input type="checkbox" name="d1"> Decision recorded: approve / exempt with conditions / request revisions / escalate to full</label>
+      <label><input type="checkbox" name="d2"> If approved: approval date and renewal due date entered in Drive protocol registry</label>
+    </form>
+
+    <p class="muted" id="progress" aria-live="polite"></p>
+    <p><button type="button" id="reset" style="font:inherit;padding:0.4rem 0.8rem;cursor:pointer;">Reset checks</button></p>
+
+    <p class="source">Does not replace HSIRB authority. Record formal decisions in Drive minutes and the registry.</p>
+  </main>
+  <script>
+    const form = document.getElementById("checklist");
+    const progress = document.getElementById("progress");
+    const boxes = () => [...form.querySelectorAll('input[type="checkbox"]')];
+    function update() {
+      const all = boxes();
+      const n = all.filter((b) => b.checked).length;
+      progress.textContent = "Checked " + n + " of " + all.length + " (session only).";
+    }
+    form.addEventListener("change", update);
+    document.getElementById("reset").addEventListener("click", () => {
+      boxes().forEach((b) => { b.checked = false; });
+      update();
+    });
+    update();
+  </script>
+</body>
+</html>

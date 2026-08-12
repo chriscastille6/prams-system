@@ -41,6 +41,15 @@
                             <li class="nav-item"><a class="nav-link" href="{% url 'studies:my_bookings' %}">My Bookings</a></li>
                             <li class="nav-item"><a class="nav-link" href="{% url 'credits:my_credits' %}">My Credits</a></li>
                         {% endif %}
+                        {% if user.is_researcher or user.is_instructor or user.is_staff or user.is_admin or user.is_irb_member %}
+                            {% if COB_HSIRB_DRIVE_ROOT_URL %}
+                            <li class="nav-item">
+                                <a class="nav-link" href="{{ COB_HSIRB_DRIVE_ROOT_URL }}" target="_blank" rel="noopener noreferrer" title="CoB HSIRB shared Google Drive">
+                                    CoB Drive materials
+                                </a>
+                            </li>
+                            {% endif %}
+                        {% endif %}
                         {% if user.is_researcher or user.is_instructor or user.is_staff or user.is_admin %}
                             <li class="nav-item"><a class="nav-link" href="{% url 'studies:researcher_dashboard' %}">My Studies</a></li>
                         {% endif %}

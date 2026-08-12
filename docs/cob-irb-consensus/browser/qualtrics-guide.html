@@ -1,0 +1,59 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>Qualtrics for PIs — CoB IRB</title>
+  <link rel="stylesheet" href="shared.css">
+</head>
+<body>
+  <nav class="site-nav" aria-label="Primary">
+    <span class="brand">CoB IRB</span>
+    <a href="index.html">Home</a>
+    <a href="standards.html">Standards</a>
+    <a href="process.html">Process</a>
+    <a href="consensus-checklist.html">Checklist</a>
+    <a href="registry.html">Registry</a>
+    <a href="retention.html">Retention</a>
+    <a href="qualtrics-guide.html">Qualtrics</a>
+  </nav>
+  <main class="wrap">
+    <p class="banner">Qualtrics is <strong>PI-owned</strong> and project-specific. This pack does not host surveys or pull response data. Mock templates are Public synthetic copy for PIs to rebuild in Qualtrics.</p>
+
+    <h1>Qualtrics integration (guidance)</h1>
+
+    <h2>PI pattern</h2>
+    <ol>
+      <li>Describe Qualtrics (or equivalent) as the data-collection instrument in the HSIRB protocol.</li>
+      <li>Build and host the live survey in the PI’s university Qualtrics account.</li>
+      <li>Keep responses in Qualtrics. Do not commit response CSVs to GitHub.</li>
+      <li>If CoB IRB needs to see the instrument, share screenshots or a View link via Drive / approved channels — not by pasting responses into consumer AI.</li>
+      <li>Recruitment and session scheduling remain project-specific (not an in-house SONA replacement).</li>
+      <li>Course credit stays with instructors; document an equivalent alternate assignment in the protocol when credit is offered.</li>
+    </ol>
+
+    <h2>What we do not build</h2>
+    <ul class="guidance">
+      <li>Qualtrics API sync into GitHub or this browser pack</li>
+      <li>Drive bots that auto-ingest response CSVs</li>
+      <li>In-house anonymous signup SaaS that would trigger IT product concerns</li>
+    </ul>
+
+    <h2>Mock survey templates</h2>
+    <p>Copy these into Qualtrics and replace placeholders. Files live next to this pack:</p>
+    <ul class="guidance">
+      <li><a href="../mock-qualtrics/01_recruitment_interest.md">01 — Recruitment interest</a></li>
+      <li><a href="../mock-qualtrics/02_eligibility_screener.md">02 — Eligibility screener</a></li>
+      <li><a href="../mock-qualtrics/03_consent_acknowledgment.md">03 — Consent acknowledgment</a></li>
+      <li><a href="../mock-qualtrics/README.md">Mock pack README</a></li>
+    </ul>
+
+    <h2>Protocol language (example)</h2>
+    <div class="card">
+      <p>“Participants will complete study measures via Qualtrics (or equivalent university-approved survey software). Survey links are managed by the PI. Response data are stored in the PI’s Qualtrics project under university account controls. No participant response files are stored in public code repositories.”</p>
+    </div>
+
+    <p class="source">See also <a href="standards.html">Social Science IRB Standards</a> and <a href="process.html">CoB HSIRB process</a>.</p>
+  </main>
+</body>
+</html>

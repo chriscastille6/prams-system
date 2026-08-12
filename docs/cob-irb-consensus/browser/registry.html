@@ -1,0 +1,938 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>Protocol Registry — CoB IRB</title>
+  <link rel="stylesheet" href="shared.css">
+  <style>
+    body { font-family: system-ui, -apple-system, sans-serif; }
+    .toolbar {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 0.5rem;
+      margin: 1rem 0;
+      align-items: center;
+    }
+    .toolbar button, .toolbar label.file-btn, .toolbar a.btn-linkish {
+      font: inherit;
+      padding: 0.45rem 0.75rem;
+      border: 1px solid var(--border);
+      border-radius: 6px;
+      background: #fff;
+      cursor: pointer;
+      text-decoration: none;
+      color: inherit;
+      display: inline-block;
+    }
+    .toolbar button.primary, .toolbar a.primary {
+      background: var(--accent);
+      color: #fff;
+      border-color: var(--accent);
+    }
+    .toolbar label.file-btn input { display: none; }
+    .flag {
+      display: inline-block;
+      font-size: 0.8rem;
+      font-weight: 600;
+      padding: 0.15rem 0.45rem;
+      border-radius: 4px;
+    }
+    .flag-green { background: var(--green-bg); color: var(--green); }
+    .flag-yellow { background: var(--yellow-bg); color: var(--yellow); }
+    .flag-red { background: var(--red-bg); color: var(--red); }
+    .flag-archived { background: #eee; color: #555; }
+    .proto-card {
+      background: #fff;
+      border: 1px solid var(--border);
+      border-left: 6px solid #ccc;
+      border-radius: 8px;
+      padding: 0.85rem 1rem;
+      margin: 0.75rem 0;
+    }
+    .proto-card.band-green { border-left-color: var(--green); }
+    .proto-card.band-yellow { border-left-color: #c9a227; background: #fffdf5; }
+    .proto-card.band-red { border-left-color: var(--red); background: #fff8f8; }
+    .proto-card.band-archived { border-left-color: #999; opacity: 0.92; }
+    .proto-card h3 { margin: 0 0 0.35rem; font-size: 1.05rem; }
+    .proto-meta { font-size: 0.88rem; color: var(--muted); margin-bottom: 0.5rem; }
+    .form-grid {
+      display: grid;
+      gap: 0.65rem;
+      grid-template-columns: 1fr;
+    }
+    @media (min-width: 700px) {
+      .form-grid { grid-template-columns: 1fr 1fr; }
+    }
+    .form-grid label { display: flex; flex-direction: column; gap: 0.25rem; font-size: 0.85rem; }
+    .form-grid input, .form-grid select, .form-grid textarea {
+      font: inherit;
+      padding: 0.4rem 0.5rem;
+      border: 1px solid var(--border);
+      border-radius: 4px;
+    }
+    .form-grid .full { grid-column: 1 / -1; }
+    .row-actions { display: flex; flex-wrap: wrap; gap: 0.35rem; margin-top: 0.5rem; }
+    .row-actions button {
+      font-size: 0.8rem;
+      padding: 0.25rem 0.45rem;
+      cursor: pointer;
+    }
+    #reminderBox, #historyBox, #citiRecheck {
+      width: 100%;
+      min-height: 4.5rem;
+      font: inherit;
+      padding: 0.5rem;
+    }
+    .status-bar { font-size: 0.9rem; color: var(--muted); margin: 0.5rem 0 1rem; }
+    .hard-rule {
+      border: 1px solid #8b1a1a;
+      background: #fde8e8;
+      padding: 0.85rem 1rem;
+      border-radius: 6px;
+      margin-bottom: 1rem;
+      font-size: 0.92rem;
+    }
+    .attn {
+      border-left: 4px solid var(--red);
+      background: var(--red-bg);
+      padding: 0.75rem 1rem;
+      margin: 1rem 0;
+      border-radius: 0 6px 6px 0;
+    }
+    .attn.yellow {
+      border-left-color: var(--yellow);
+      background: var(--yellow-bg);
+    }
+    .inv-row {
+      display: grid;
+      gap: 0.4rem;
+      grid-template-columns: 1fr;
+      border: 1px dashed var(--border);
+      padding: 0.6rem;
+      margin: 0.4rem 0;
+      border-radius: 6px;
+    }
+    @media (min-width: 700px) {
+      .inv-row { grid-template-columns: 1.2fr 0.6fr 0.7fr 0.9fr 1fr auto; align-items: end; }
+    }
+  </style>
+</head>
+<body>
+  <nav class="site-nav" aria-label="Primary">
+    <span class="brand">CoB IRB</span>
+    <a href="index.html">Home</a>
+    <a href="standards.html">Standards</a>
+    <a href="process.html">Process</a>
+    <a href="consensus-checklist.html">Checklist</a>
+    <a href="registry.html">Registry</a>
+    <a href="retention.html">Retention</a>
+    <a href="qualtrics-guide.html">Qualtrics</a>
+  </nav>
+  <main class="wrap wrap-wide">
+    <p class="hard-rule"><strong>Hard rule — no deletion.</strong> This tool cannot delete protocol rows. CITI PDFs stay on Drive (Confidential). Live registry stays on Drive — never commit filled JSON to GitHub. <a href="retention.html">Retention</a>.</p>
+
+    <p class="banner"><strong>Protocol registry</strong> — approval / renewal cards + investigator CITI checklist. Import from Drive, edit in browser, export dated snapshot back to Drive.</p>
+
+    <h1>Approved protocols — renewal &amp; CITI</h1>
+    <p class="status-bar" id="statusBar">No registry loaded. Import a Drive file, load the synthetic demo, or start empty.</p>
+
+    <div class="toolbar">
+      <label class="file-btn">Import JSON<input type="file" id="importFile" accept="application/json,.json"></label>
+      <button type="button" id="loadDemo">Load synthetic demo</button>
+      <button type="button" id="loadEmpty">Start empty</button>
+      <button type="button" class="primary" id="exportBtn" disabled>Export current JSON</button>
+      <button type="button" id="exportSnapshotBtn" disabled>Export dated snapshot</button>
+      <a class="btn-linkish primary" id="openCitiFolder" href="https://drive.google.com/drive/folders/1JTJadjcEZEkOQwjSvsTkz2PcbOzqNFKi" target="_blank" rel="noopener noreferrer">Open CITI folder</a>
+      <label style="margin-left:0.5rem;font-size:0.85rem;"><input type="checkbox" id="showArchived"> Show archived</label>
+    </div>
+
+    <section id="needsAttention" hidden></section>
+    <section id="citiAttention" hidden></section>
+
+    <h2>Protocols</h2>
+    <div id="cardList"></div>
+
+    <h2 id="formHeading">Add protocol</h2>
+    <div class="card">
+      <form class="form-grid" id="editForm">
+        <input type="hidden" id="editIndex" value="-1">
+        <label>Protocol ID<input required id="f_id" placeholder="HSIRB-YYYY-NNN"></label>
+        <label>PI display<input id="f_pi" placeholder="Initials or name (Drive-only)"></label>
+        <label class="full">Short title<input required id="f_title"></label>
+        <label>Study context
+          <select id="f_context">
+            <option value="social_behavioral">social_behavioral</option>
+            <option value="biomedical_clinical">biomedical_clinical</option>
+            <option value="mixed_other">mixed_other</option>
+          </select>
+        </label>
+        <label>Status
+          <select id="f_status">
+            <option value="active">active</option>
+            <option value="archived">archived (retained)</option>
+          </select>
+        </label>
+        <label>Approval date<input required type="date" id="f_approval"></label>
+        <label>Renewal due<input required type="date" id="f_renewal"></label>
+        <label class="full">Notes<textarea id="f_notes" rows="2" placeholder="No participant PII"></textarea></label>
+        <label class="full">Change summary (required when updating)<input id="f_change" placeholder="e.g. Renewal date updated after continuing review"></label>
+        <label>Recorded by<input id="f_by" placeholder="Your name / initials"></label>
+
+        <div class="full">
+          <strong>Investigators (CITI checklist)</strong>
+          <p class="muted" style="margin:0.25rem 0 0.5rem;">Confirm PDF is in Drive, then enter expiration from the certificate. No automatic OCR.</p>
+          <div id="invList"></div>
+          <button type="button" id="addInv">Add investigator</button>
+        </div>
+
+        <div class="full toolbar">
+          <button type="submit" class="primary">Save update</button>
+          <button type="button" id="cancelEdit">Cancel edit</button>
+          <button type="button" id="setRenewalPlus1y">Set renewal = approval + 1 year</button>
+        </div>
+      </form>
+    </div>
+
+    <h2>CITI recheck prompts</h2>
+    <pre id="citiRecheck" style="background:#fff;border:1px solid var(--border);padding:0.75rem;white-space:pre-wrap;font-size:0.85rem;">Select a protocol and click “CITI recheck”.</pre>
+
+    <h2>Change log (selected protocol)</h2>
+    <pre id="historyBox" style="background:#fff;border:1px solid var(--border);padding:0.75rem;overflow:auto;min-height:4rem;white-space:pre-wrap;font-size:0.85rem;">Select History on a card.</pre>
+
+    <h2>PI renewal reminder (copy / paste)</h2>
+    <textarea id="reminderBox" readonly placeholder="Reminder text appears here."></textarea>
+    <div class="toolbar">
+      <button type="button" id="copyReminder">Copy to clipboard</button>
+    </div>
+
+    <p class="source">Renewal: <strong>yellow</strong> ≤30 days; <strong>red</strong> overdue (not protected until renewed); <strong>green</strong> &gt;30 days. CITI: yellow ≤30 days; red missing/expired/not on Drive. Schema: <code>protocol_registry.schema.json</code>.</p>
+  </main>
+  <script>
+(function () {
+  const RETENTION = "no_delete_update_only";
+  const DEFAULT_CITI_FOLDER =
+    "https://drive.google.com/drive/folders/1JTJadjcEZEkOQwjSvsTkz2PcbOzqNFKi";
+
+  const today = () => {
+    const d = new Date();
+    return new Date(d.getFullYear(), d.getMonth(), d.getDate());
+  };
+  const stamp = () => {
+    const d = today();
+    return [
+      d.getFullYear(),
+      String(d.getMonth() + 1).padStart(2, "0"),
+      String(d.getDate()).padStart(2, "0"),
+    ].join("-");
+  };
+  const stampFile = () => {
+    const d = new Date();
+    return (
+      stamp() +
+      "_" +
+      String(d.getHours()).padStart(2, "0") +
+      String(d.getMinutes()).padStart(2, "0")
+    );
+  };
+  const parseDate = (s) => {
+    if (!s) return null;
+    const [y, m, day] = String(s).split("-").map(Number);
+    return new Date(y, m - 1, day);
+  };
+  const daysUntil = (dateStr) => {
+    const due = parseDate(dateStr);
+    if (!due) return null;
+    return Math.round((due - today()) / 86400000);
+  };
+
+  /** Renewal: yellow ≤30, red overdue, green >30 */
+  const renewalFlag = (protocol) => {
+    if (protocol.status === "archived") {
+      return { band: "archived", label: "Archived", days: null };
+    }
+    const days = daysUntil(protocol.renewal_due_date);
+    if (days === null) return { band: "yellow", label: "No renewal date", days: null };
+    if (days < 0) return { band: "red", label: "Overdue — not protected", days };
+    if (days <= 30) return { band: "yellow", label: "Renew within 30 days", days };
+    return { band: "green", label: "OK >30d", days };
+  };
+
+  /** CITI: red if missing/expired/not on drive; yellow ≤30; green otherwise */
+  const citiFlagForInv = (inv) => {
+    if (!inv.citi_on_drive) {
+      return { band: "red", label: "Not on Drive" };
+    }
+    if (!inv.citi_expiration_date) {
+      return { band: "red", label: "No expiration date" };
+    }
+    const days = daysUntil(inv.citi_expiration_date);
+    if (days === null) return { band: "red", label: "Bad date" };
+    if (days < 0) return { band: "red", label: "CITI expired" };
+    if (days <= 30) return { band: "yellow", label: "CITI ≤30d" };
+    return { band: "green", label: "CITI OK" };
+  };
+
+  const worstCiti = (protocol) => {
+    const invs = protocol.investigators || [];
+    if (!invs.length) return { band: "red", label: "No investigators" };
+    const order = { red: 0, yellow: 1, green: 2 };
+    let worst = { band: "green", label: "CITI OK" };
+    invs.forEach((inv) => {
+      const f = citiFlagForInv(inv);
+      if (order[f.band] < order[worst.band]) worst = f;
+    });
+    return worst;
+  };
+
+  let registry = null;
+  let selectedHistoryIndex = null;
+  let draftInvestigators = [];
+
+  const el = {
+    statusBar: document.getElementById("statusBar"),
+    cardList: document.getElementById("cardList"),
+    needsAttention: document.getElementById("needsAttention"),
+    citiAttention: document.getElementById("citiAttention"),
+    exportBtn: document.getElementById("exportBtn"),
+    exportSnapshotBtn: document.getElementById("exportSnapshotBtn"),
+    showArchived: document.getElementById("showArchived"),
+    form: document.getElementById("editForm"),
+    editIndex: document.getElementById("editIndex"),
+    formHeading: document.getElementById("formHeading"),
+    reminderBox: document.getElementById("reminderBox"),
+    historyBox: document.getElementById("historyBox"),
+    citiRecheck: document.getElementById("citiRecheck"),
+    invList: document.getElementById("invList"),
+    openCitiFolder: document.getElementById("openCitiFolder"),
+  };
+
+  function escapeHtml(s) {
+    return String(s)
+      .replace(/&/g, "&amp;")
+      .replace(/</g, "&lt;")
+      .replace(/>/g, "&gt;")
+      .replace(/"/g, "&quot;");
+  }
+
+  function touchUpdated() {
+    if (!registry) return;
+    registry.updated_at = stamp();
+    registry.retention_policy = RETENTION;
+    if (!registry.citi_folder_url) registry.citi_folder_url = DEFAULT_CITI_FOLDER;
+    el.openCitiFolder.href = registry.citi_folder_url || DEFAULT_CITI_FOLDER;
+  }
+
+  function appendLog(proto, summary, by) {
+    if (!Array.isArray(proto.change_log)) proto.change_log = [];
+    proto.change_log.push({
+      date: stamp(),
+      summary: summary || "Updated",
+      by: (by || "").trim() || "CoB IRB rep",
+    });
+  }
+
+  function normalizeInv(inv) {
+    return {
+      name_display: String(inv.name_display || "").trim(),
+      role: inv.role === "co_i" ? "co_i" : "pi",
+      citi_on_drive: Boolean(inv.citi_on_drive),
+      citi_expiration_date: inv.citi_expiration_date || null,
+      citi_notes: String(inv.citi_notes || "").trim(),
+    };
+  }
+
+  function normalizeProtocol(p) {
+    return {
+      protocol_id: String(p.protocol_id || "").trim(),
+      short_title: String(p.short_title || "").trim(),
+      study_context: p.study_context || "social_behavioral",
+      approval_date: p.approval_date,
+      renewal_due_date: p.renewal_due_date,
+      status: p.status === "archived" ? "archived" : "active",
+      pi_display: String(p.pi_display || "").trim(),
+      notes: String(p.notes || "").trim(),
+      investigators: Array.isArray(p.investigators)
+        ? p.investigators.map(normalizeInv)
+        : [],
+      change_log: Array.isArray(p.change_log)
+        ? p.change_log.map((e) => ({
+            date: e.date,
+            summary: String(e.summary || ""),
+            by: String(e.by || ""),
+          }))
+        : [],
+    };
+  }
+
+  function setRegistry(data, label) {
+    if (!data || data.version !== 1 || !Array.isArray(data.protocols)) {
+      alert("Invalid registry file. Expected version 1 with a protocols array.");
+      return;
+    }
+    registry = {
+      version: 1,
+      updated_at: data.updated_at || stamp(),
+      retention_policy: RETENTION,
+      citi_folder_url: data.citi_folder_url || DEFAULT_CITI_FOLDER,
+      protocols: data.protocols.map(normalizeProtocol),
+    };
+    el.exportBtn.disabled = false;
+    el.exportSnapshotBtn.disabled = false;
+    el.openCitiFolder.href = registry.citi_folder_url;
+    selectedHistoryIndex = null;
+    el.historyBox.textContent = "Select History on a card.";
+    el.citiRecheck.textContent = "Select a protocol and click “CITI recheck”.";
+    el.statusBar.textContent =
+      label +
+      " — " +
+      registry.protocols.length +
+      " protocol(s); updated_at " +
+      registry.updated_at +
+      ". Retention: no delete.";
+    render();
+  }
+
+  function renderInvEditor() {
+    el.invList.innerHTML = draftInvestigators
+      .map((inv, i) => {
+        return (
+          '<div class="inv-row" data-inv="' +
+          i +
+          '">' +
+          '<label>Name<input data-f="name_display" value="' +
+          escapeHtml(inv.name_display) +
+          '"></label>' +
+          '<label>Role<select data-f="role"><option value="pi"' +
+          (inv.role === "pi" ? " selected" : "") +
+          '>pi</option><option value="co_i"' +
+          (inv.role === "co_i" ? " selected" : "") +
+          ">co_i</option></select></label>" +
+          '<label>On Drive?<select data-f="citi_on_drive"><option value="true"' +
+          (inv.citi_on_drive ? " selected" : "") +
+          '>yes</option><option value="false"' +
+          (!inv.citi_on_drive ? " selected" : "") +
+          ">no</option></select></label>" +
+          '<label>CITI expires<input type="date" data-f="citi_expiration_date" value="' +
+          escapeHtml(inv.citi_expiration_date || "") +
+          '"></label>' +
+          '<label>Notes<input data-f="citi_notes" value="' +
+          escapeHtml(inv.citi_notes || "") +
+          '"></label>' +
+          '<button type="button" data-remove-inv="' +
+          i +
+          '">Remove</button>' +
+          "</div>"
+        );
+      })
+      .join("");
+  }
+
+  function readDraftInvestigatorsFromDom() {
+    const rows = el.invList.querySelectorAll(".inv-row");
+    draftInvestigators = [...rows].map((row) => {
+      const get = (f) => {
+        const node = row.querySelector('[data-f="' + f + '"]');
+        return node ? node.value : "";
+      };
+      return normalizeInv({
+        name_display: get("name_display"),
+        role: get("role"),
+        citi_on_drive: get("citi_on_drive") === "true",
+        citi_expiration_date: get("citi_expiration_date") || null,
+        citi_notes: get("citi_notes"),
+      });
+    });
+  }
+
+  function showHistory(index) {
+    selectedHistoryIndex = index;
+    const p = registry && registry.protocols[index];
+    if (!p) {
+      el.historyBox.textContent = "Select History on a card.";
+      return;
+    }
+    const lines = (p.change_log || []).map(
+      (e) => e.date + " — " + e.summary + (e.by ? " (" + e.by + ")" : "")
+    );
+    el.historyBox.textContent =
+      p.protocol_id +
+      " — change log (" +
+      lines.length +
+      ")\n" +
+      (lines.length ? lines.join("\n") : "(no entries yet)");
+  }
+
+  function showCitiRecheck(index) {
+    const p = registry && registry.protocols[index];
+    if (!p) return;
+    const lines = [
+      "CITI recheck — " + p.protocol_id + ' ("' + p.short_title + '")',
+      "1. Open CITI folder in Drive (button above).",
+      "2. Confirm each investigator PDF is present (citi_on_drive = yes).",
+      "3. Enter citi_expiration_date from the certificate face.",
+      "4. Save update + Export current JSON; move prior live file to Drive _archive/ (no Trash).",
+      "",
+      "Investigators:",
+    ];
+    (p.investigators || []).forEach((inv) => {
+      const f = citiFlagForInv(inv);
+      lines.push(
+        "- " +
+          inv.name_display +
+          " (" +
+          inv.role +
+          "): on_drive=" +
+          inv.citi_on_drive +
+          "; expires=" +
+          (inv.citi_expiration_date || "—") +
+          "; flag=" +
+          f.label
+      );
+    });
+    if (!(p.investigators || []).length) {
+      lines.push("- (none listed — add PI / co-I rows)");
+    }
+    el.citiRecheck.textContent = lines.join("\n");
+  }
+
+  function reminderText(p) {
+    const flag = renewalFlag(p);
+    const urgency =
+      flag.days !== null && flag.days < 0
+        ? "OVERDUE — continuing activity is not protected until renewed"
+        : flag.days !== null && flag.days <= 30
+          ? "due within 30 days"
+          : "approaching renewal";
+    return (
+      "Subject: Continuing review reminder — " +
+      p.protocol_id +
+      "\n\n" +
+      "Hello " +
+      (p.pi_display || "PI") +
+      ",\n\n" +
+      "CoB HSIRB reminder for protocol " +
+      p.protocol_id +
+      " (“" +
+      p.short_title +
+      "”).\n\n" +
+      "Approval date: " +
+      p.approval_date +
+      "\n" +
+      "Renewal due: " +
+      p.renewal_due_date +
+      " (" +
+      urgency +
+      ").\n\n" +
+      "Please submit continuing-review materials about 30 days before expiration.\n\n" +
+      "Thank you,\nCoB HSIRB representative\n"
+    );
+  }
+
+  function render() {
+    if (!registry) {
+      el.cardList.innerHTML = "";
+      el.needsAttention.hidden = true;
+      el.citiAttention.hidden = true;
+      return;
+    }
+    const showArchived = el.showArchived.checked;
+    const rows = registry.protocols
+      .map((p, index) => ({ p, index, renew: renewalFlag(p), citi: worstCiti(p) }))
+      .filter(({ p }) => showArchived || p.status !== "archived");
+
+    el.cardList.innerHTML = rows
+      .map(({ p, index, renew, citi }) => {
+        const bandClass = "band-" + renew.band;
+        const invSummary = (p.investigators || [])
+          .map((inv) => {
+            const f = citiFlagForInv(inv);
+            return (
+              '<span class="flag flag-' +
+              f.band +
+              '" style="margin:0.15rem;">' +
+              escapeHtml(inv.name_display) +
+              ": " +
+              escapeHtml(f.label) +
+              "</span>"
+            );
+          })
+          .join(" ");
+        return (
+          '<article class="proto-card ' +
+          bandClass +
+          '">' +
+          "<h3>" +
+          escapeHtml(p.protocol_id) +
+          " — " +
+          escapeHtml(p.short_title) +
+          "</h3>" +
+          '<div class="proto-meta">PI: ' +
+          escapeHtml(p.pi_display || "—") +
+          " · " +
+          escapeHtml(p.study_context) +
+          " · Approved " +
+          escapeHtml(p.approval_date) +
+          " · Renewal " +
+          escapeHtml(p.renewal_due_date) +
+          (renew.days !== null ? " (" + renew.days + "d)" : "") +
+          "</div>" +
+          '<div><span class="flag flag-' +
+          renew.band +
+          '">Renewal: ' +
+          escapeHtml(renew.label) +
+          '</span> <span class="flag flag-' +
+          citi.band +
+          '">CITI: ' +
+          escapeHtml(citi.label) +
+          "</span></div>" +
+          '<div style="margin-top:0.45rem;">' +
+          (invSummary || '<span class="muted">No investigators listed</span>') +
+          "</div>" +
+          '<div class="row-actions">' +
+          '<button type="button" data-act="edit" data-i="' +
+          index +
+          '">Edit</button>' +
+          '<button type="button" data-act="history" data-i="' +
+          index +
+          '">History</button>' +
+          '<button type="button" data-act="citi" data-i="' +
+          index +
+          '">CITI recheck</button>' +
+          (p.status === "archived"
+            ? '<button type="button" data-act="unarchive" data-i="' +
+              index +
+              '">Unarchive</button>'
+            : '<button type="button" data-act="archive" data-i="' +
+              index +
+              '">Archive</button>') +
+          '<button type="button" data-act="remind" data-i="' +
+          index +
+          '">Copy reminder</button>' +
+          "</div></article>"
+        );
+      })
+      .join("");
+
+    const renewAttn = registry.protocols
+      .map((p, index) => ({ p, index, renew: renewalFlag(p) }))
+      .filter(
+        ({ p, renew }) =>
+          p.status === "active" && (renew.band === "red" || renew.band === "yellow")
+      );
+    if (!renewAttn.length) {
+      el.needsAttention.hidden = true;
+      el.needsAttention.innerHTML = "";
+    } else {
+      el.needsAttention.hidden = false;
+      el.needsAttention.innerHTML =
+        '<div class="attn"><strong>Needs renewal / attention</strong> (' +
+        renewAttn.length +
+        ")</div><ul>" +
+        renewAttn
+          .map(({ p, renew }) => {
+            const cls = renew.band === "red" ? "attn" : "attn yellow";
+            return (
+              '<li class="' +
+              cls +
+              '" style="list-style:none;margin:0.5rem 0;">' +
+              escapeHtml(p.protocol_id) +
+              " — " +
+              escapeHtml(renew.label) +
+              " (due " +
+              escapeHtml(p.renewal_due_date) +
+              ")</li>"
+            );
+          })
+          .join("") +
+        "</ul>";
+    }
+
+    const citiAttn = registry.protocols
+      .map((p, index) => ({ p, index, citi: worstCiti(p) }))
+      .filter(
+        ({ p, citi }) =>
+          p.status === "active" && (citi.band === "red" || citi.band === "yellow")
+      );
+    if (!citiAttn.length) {
+      el.citiAttention.hidden = true;
+      el.citiAttention.innerHTML = "";
+    } else {
+      el.citiAttention.hidden = false;
+      el.citiAttention.innerHTML =
+        '<div class="attn yellow"><strong>CITI attention</strong> (' +
+        citiAttn.length +
+        ") — open Drive CITI folder and update checklist</div><ul>" +
+        citiAttn
+          .map(({ p, citi }) => {
+            return (
+              '<li style="margin:0.35rem 0;">' +
+              escapeHtml(p.protocol_id) +
+              ": " +
+              escapeHtml(citi.label) +
+              "</li>"
+            );
+          })
+          .join("") +
+        "</ul>";
+    }
+
+    if (selectedHistoryIndex !== null) showHistory(selectedHistoryIndex);
+  }
+
+  function fillForm(p, index) {
+    el.editIndex.value = String(index);
+    el.formHeading.textContent = index < 0 ? "Add protocol" : "Edit protocol (update — not delete)";
+    document.getElementById("f_id").value = p.protocol_id || "";
+    document.getElementById("f_pi").value = p.pi_display || "";
+    document.getElementById("f_title").value = p.short_title || "";
+    document.getElementById("f_context").value = p.study_context || "social_behavioral";
+    document.getElementById("f_status").value = p.status || "active";
+    document.getElementById("f_approval").value = p.approval_date || "";
+    document.getElementById("f_renewal").value = p.renewal_due_date || "";
+    document.getElementById("f_notes").value = p.notes || "";
+    document.getElementById("f_change").value = "";
+    draftInvestigators = (p.investigators || []).map(normalizeInv);
+    if (!draftInvestigators.length && p.pi_display) {
+      draftInvestigators = [
+        normalizeInv({
+          name_display: p.pi_display,
+          role: "pi",
+          citi_on_drive: false,
+          citi_expiration_date: null,
+          citi_notes: "",
+        }),
+      ];
+    }
+    renderInvEditor();
+  }
+
+  function clearForm() {
+    fillForm(
+      {
+        protocol_id: "",
+        short_title: "",
+        study_context: "social_behavioral",
+        approval_date: "",
+        renewal_due_date: "",
+        status: "active",
+        pi_display: "",
+        notes: "",
+        investigators: [],
+      },
+      -1
+    );
+    draftInvestigators = [];
+    renderInvEditor();
+  }
+
+  function downloadJson(obj, filename) {
+    const blob = new Blob([JSON.stringify(obj, null, 2)], {
+      type: "application/json",
+    });
+    const a = document.createElement("a");
+    a.href = URL.createObjectURL(blob);
+    a.download = filename;
+    a.click();
+    URL.revokeObjectURL(a.href);
+  }
+
+  document.getElementById("importFile").addEventListener("change", (e) => {
+    const file = e.target.files && e.target.files[0];
+    if (!file) return;
+    const reader = new FileReader();
+    reader.onload = () => {
+      try {
+        setRegistry(JSON.parse(reader.result), "Imported: " + file.name);
+      } catch (err) {
+        alert("Could not parse JSON: " + err.message);
+      }
+    };
+    reader.readAsText(file);
+    e.target.value = "";
+  });
+
+  document.getElementById("loadDemo").addEventListener("click", () => {
+    fetch("protocol_registry.demo.json")
+      .then((r) => r.json())
+      .then((data) => setRegistry(data, "Synthetic demo loaded"))
+      .catch(() =>
+        alert("Could not load demo JSON. Use a local static server or Import.")
+      );
+  });
+
+  document.getElementById("loadEmpty").addEventListener("click", () => {
+    setRegistry(
+      {
+        version: 1,
+        updated_at: stamp(),
+        retention_policy: RETENTION,
+        citi_folder_url: DEFAULT_CITI_FOLDER,
+        protocols: [],
+      },
+      "Empty registry"
+    );
+  });
+
+  document.getElementById("exportBtn").addEventListener("click", () => {
+    if (!registry) return;
+    touchUpdated();
+    downloadJson(registry, "protocol_registry.json");
+    el.statusBar.textContent =
+      "Exported protocol_registry.json — upload as current on Drive; move prior live file to _archive/ (no Trash).";
+  });
+
+  document.getElementById("exportSnapshotBtn").addEventListener("click", () => {
+    if (!registry) return;
+    touchUpdated();
+    const name = "protocol_registry_" + stampFile() + ".json";
+    downloadJson(registry, name);
+    el.statusBar.textContent = "Exported dated snapshot " + name + " for Drive _archive/.";
+  });
+
+  el.showArchived.addEventListener("change", render);
+
+  document.getElementById("addInv").addEventListener("click", () => {
+    readDraftInvestigatorsFromDom();
+    draftInvestigators.push(
+      normalizeInv({
+        name_display: "",
+        role: "co_i",
+        citi_on_drive: false,
+        citi_expiration_date: null,
+        citi_notes: "",
+      })
+    );
+    renderInvEditor();
+  });
+
+  el.invList.addEventListener("click", (e) => {
+    const btn = e.target.closest("[data-remove-inv]");
+    if (!btn) return;
+    readDraftInvestigatorsFromDom();
+    const i = Number(btn.getAttribute("data-remove-inv"));
+    draftInvestigators.splice(i, 1);
+    renderInvEditor();
+  });
+
+  el.cardList.addEventListener("click", (e) => {
+    const btn = e.target.closest("button[data-act]");
+    if (!btn || !registry) return;
+    const i = Number(btn.getAttribute("data-i"));
+    const p = registry.protocols[i];
+    if (!p) return;
+    const act = btn.getAttribute("data-act");
+    if (act === "edit") fillForm(p, i);
+    if (act === "history") showHistory(i);
+    if (act === "citi") showCitiRecheck(i);
+    if (act === "archive") {
+      p.status = "archived";
+      appendLog(
+        p,
+        "Status set to archived — row and Drive files retained.",
+        document.getElementById("f_by").value
+      );
+      touchUpdated();
+      render();
+      showHistory(i);
+    }
+    if (act === "unarchive") {
+      p.status = "active";
+      appendLog(p, "Status set back to active.", document.getElementById("f_by").value);
+      touchUpdated();
+      render();
+      showHistory(i);
+    }
+    if (act === "remind") {
+      el.reminderBox.value = reminderText(p);
+    }
+  });
+
+  el.form.addEventListener("submit", (e) => {
+    e.preventDefault();
+    if (!registry) {
+      setRegistry(
+        {
+          version: 1,
+          updated_at: stamp(),
+          retention_policy: RETENTION,
+          citi_folder_url: DEFAULT_CITI_FOLDER,
+          protocols: [],
+        },
+        "Empty registry"
+      );
+    }
+    const idx = Number(el.editIndex.value);
+    const changeSummary = document.getElementById("f_change").value.trim();
+    const by = document.getElementById("f_by").value.trim();
+    if (idx >= 0 && !changeSummary) {
+      alert("Enter a change summary when updating an existing protocol.");
+      return;
+    }
+    readDraftInvestigatorsFromDom();
+    const proto = normalizeProtocol({
+      protocol_id: document.getElementById("f_id").value,
+      short_title: document.getElementById("f_title").value,
+      study_context: document.getElementById("f_context").value,
+      approval_date: document.getElementById("f_approval").value,
+      renewal_due_date: document.getElementById("f_renewal").value,
+      status: document.getElementById("f_status").value,
+      pi_display: document.getElementById("f_pi").value,
+      notes: document.getElementById("f_notes").value,
+      investigators: draftInvestigators,
+      change_log:
+        idx >= 0 && registry.protocols[idx]
+          ? registry.protocols[idx].change_log
+          : [],
+    });
+    if (idx >= 0 && idx < registry.protocols.length) {
+      appendLog(proto, changeSummary, by);
+      registry.protocols[idx] = proto;
+      selectedHistoryIndex = idx;
+    } else {
+      appendLog(proto, changeSummary || "Initial protocol recorded.", by);
+      registry.protocols.push(proto);
+      selectedHistoryIndex = registry.protocols.length - 1;
+    }
+    touchUpdated();
+    clearForm();
+    render();
+  });
+
+  document.getElementById("cancelEdit").addEventListener("click", clearForm);
+
+  document.getElementById("setRenewalPlus1y").addEventListener("click", () => {
+    const a = document.getElementById("f_approval").value;
+    if (!a) {
+      alert("Set approval date first.");
+      return;
+    }
+    const d = parseDate(a);
+    d.setFullYear(d.getFullYear() + 1);
+    document.getElementById("f_renewal").value = [
+      d.getFullYear(),
+      String(d.getMonth() + 1).padStart(2, "0"),
+      String(d.getDate()).padStart(2, "0"),
+    ].join("-");
+  });
+
+  document.getElementById("copyReminder").addEventListener("click", async () => {
+    const text = el.reminderBox.value;
+    if (!text) {
+      alert("Use Copy reminder on a protocol card first.");
+      return;
+    }
+    try {
+      await navigator.clipboard.writeText(text);
+      el.statusBar.textContent = "Reminder copied to clipboard.";
+    } catch (_) {
+      el.reminderBox.select();
+      document.execCommand("copy");
+    }
+  });
+
+  renderInvEditor();
+})();
+  </script>
+</body>
+</html>

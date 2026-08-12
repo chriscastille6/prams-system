@@ -229,6 +229,11 @@ CORS_ALLOWED_ORIGINS = _config('CORS_ALLOWED_ORIGINS', default='http://localhost
 SITE_NAME = _config('SITE_NAME', default='Participant Recruitment and Management System')
 SITE_URL = _config('SITE_URL', default='http://localhost:8000')
 INSTITUTION_NAME = _config('INSTITUTION_NAME', default='Nicholls State University')
+# CoB HSIRB shared materials (Nicholls Google Drive). Override via env if the root moves.
+COB_HSIRB_DRIVE_ROOT_URL = _config(
+    'COB_HSIRB_DRIVE_ROOT_URL',
+    default='https://drive.google.com/drive/folders/1jGaOtprui6PUq7r5W6qR6QYC9sRRXQpG',
+)
 
 # Participant Information & Consent document (full doc at /studies/participant-information/)
 # Used on the assessment platform "Your Rights and Options" page → "Read full participant information document"
@@ -252,7 +257,7 @@ NO_SHOW_LIMIT = _config('NO_SHOW_LIMIT', default=2, cast=int)
 REMINDER_HOURS_BEFORE = _config('REMINDER_HOURS_BEFORE', default='24,2', cast=Csv(cast=int))
 
 # CSRF Settings
-CSRF_TRUSTED_ORIGINS = _config('CSRF_TRUSTED_ORIGINS', default='http://localhost:8000', cast=Csv())
+CSRF_TRUSTED_ORIGINS = _config('CSRF_TRUSTED_ORIGINS', default='http://localhost:8000,http://127.0.0.1:8000', cast=Csv())
 CSRF_COOKIE_HTTPONLY = True
 CSRF_USE_SESSIONS = False
 
