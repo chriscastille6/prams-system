@@ -59,12 +59,18 @@ docs/_build/
 node_modules/
 scripts/node_modules/
 
-# Local Netlify folder
-.netlify
-
-# Confidential CITI / PI date artifacts (keep on Drive, not GitHub)
+# Confidential IRB / CITI / consent packets (office copies on CoB-HSIRB Drive)
+approved irb/
 docs/citi*.pdf
 docs/citi_pi_dates.txt
 **/hsirb_amendment_*/CITI/*.pdf
 **/CITI/*citiCompletion*.pdf
 **/CITI/*citiCompletionReport*.pdf
+**/citiCompletionCertificate*.pdf
+apps/studies/assets/irb/**/*.pdf
+apps/studies/assets/irb/**/*.docx
+apps/studies/assets/irb/**/*.doc
+Flyer_EI_Study*.pdf
+IRB_BRIEFING_*.pdf
+protocol_templates/*Flyer*.pdf
+protocol_templates/*Flyer*.docx.pdf
