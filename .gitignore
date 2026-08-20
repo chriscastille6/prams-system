@@ -58,3 +58,19 @@ docs/_build/
 # Node (for scripts/generate_irb_briefing_pdf.js)
 node_modules/
 scripts/node_modules/
+
+# Confidential IRB / CITI / consent packets (office copies on CoB-HSIRB Drive)
+approved irb/
+docs/citi*.pdf
+docs/citi_pi_dates.txt
+**/hsirb_amendment_*/CITI/*.pdf
+**/CITI/*citiCompletion*.pdf
+**/CITI/*citiCompletionReport*.pdf
+**/citiCompletionCertificate*.pdf
+apps/studies/assets/irb/**/*.pdf
+apps/studies/assets/irb/**/*.docx
+apps/studies/assets/irb/**/*.doc
+Flyer_EI_Study*.pdf
+IRB_BRIEFING_*.pdf
+protocol_templates/*Flyer*.pdf
+protocol_templates/*Flyer*.docx.pdf
