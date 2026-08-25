@@ -17,30 +17,65 @@ ALLOWED_DRIVE_HOSTS = frozenset({
     "docs.google.com",
 })
 
-# Folder / file / Workspace document paths — not Google open-redirectors
-# such as /gview?url= or /url?q=.
+# Entire path after unquote. A prefix .match() would accept
+# /document/d/<id>/../../../gview (browsers then land on Google's
+# /gview?url= and /url?q= open-redirectors). Optional single suffix covers
+# /edit, /view, /preview. /open and /folderview are exact paths only.
 _DRIVE_RESOURCE_PATH = re.compile(
     r"^("
-    r"/drive/(?:u/\d+/)?folders/[A-Za-z0-9_-]+"
+    r"(?:/drive/(?:u/\d+/)?folders/[A-Za-z0-9_-]+"
     r"|/file/d/[A-Za-z0-9_-]+"
     r"|/document/d/[A-Za-z0-9_-]+"
     r"|/spreadsheets/d/[A-Za-z0-9_-]+"
     r"|/presentation/d/[A-Za-z0-9_-]+"
     r"|/forms/d/[A-Za-z0-9_-]+"
+    r")(?:/[A-Za-z0-9_-]+)?"
     r"|/open"
     r"|/folderview"
-    r")(/|$)",
+    r")$",
     re.IGNORECASE,
 )
-# Same prefix as the /open|/folderview alternatives above, including a trailing
-# slash or extra path that .match() already accepts.
-_OPEN_OR_FOLDERVIEW_PATH = re.compile(r"^/(?:open|folderview)(?:/|$)", re.IGNORECASE)
+_OPEN_OR_FOLDERVIEW_PATH = re.compile(r"^/(?:open|folderview)$", re.IGNORECASE)
 _DRIVE_ID = re.compile(r"^[A-Za-z0-9_-]+$")
+_MAX_UNQUOTE_ROUNDS = 5
 
 DRIVE_URL_HELP = (
     "Must be an https Google Drive or Docs materials link "
     "(drive.google.com or docs.google.com)."
 )
+
+
+def _fully_unquote_path(path: str) -> str:
+    """Decode percent-encoding until stable. '' if it never settles."""
+    current = path
+    for _ in range(_MAX_UNQUOTE_ROUNDS):
+        decoded = unquote(current)
+        if decoded == current:
+            return current
+        current = decoded
+    return ""
+
+
+def _normalize_url_path(path: str) -> str:
+    """Unquote and collapse '//' so the allowlist can fullmatch the path.
+
+    Dot-segments are rejected, not rewritten: a researcher URL that starts
+    with /document/d/<id>/ and then walks upward must not be stored as a
+    trusted materials href (browsers would then reach /gview or /url).
+    """
+    if not path or "\\" in path or "\x00" in path:
+        return ""
+    decoded = _fully_unquote_path(path)
+    if not decoded or "\\" in decoded or "\x00" in decoded or "%" in decoded:
+        return ""
+    segments: list[str] = []
+    for part in decoded.split("/"):
+        if part == "":
+            continue
+        if part in (".", ".."):
+            return ""
+        segments.append(part)
+    return "/" + "/".join(segments)
 
 
 def sanitize_drive_folder_url(url: str | None) -> str:
@@ -67,11 +102,11 @@ def sanitize_drive_folder_url(url: str | None) -> str:
     if host not in ALLOWED_DRIVE_HOSTS:
         return ""
 
-    path = unquote(parsed.path or "")
-    if not _DRIVE_RESOURCE_PATH.match(path):
+    path = _normalize_url_path(parsed.path or "")
+    if not path or not _DRIVE_RESOURCE_PATH.fullmatch(path):
         return ""
 
-    if _OPEN_OR_FOLDERVIEW_PATH.match(path):
+    if _OPEN_OR_FOLDERVIEW_PATH.fullmatch(path):
         folder_ids = parse_qs(parsed.query).get("id", [])
         if not folder_ids or not _DRIVE_ID.fullmatch(folder_ids[0]):
             return ""

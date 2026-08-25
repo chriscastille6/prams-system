@@ -77,6 +77,23 @@ class DriveFolderUrlAllowlistTests(SimpleTestCase):
         for url in phishing:
             self.assertEqual(sanitize_drive_folder_url(url), "", msg=url)
 
+    def test_rejects_dot_segment_walks_to_google_open_redirectors(self):
+        """Reject /document/d/<id>/../ walks that browsers resolve to /gview."""
+        doc = "1SyntheticDocId_abc"
+        folder = "1SyntheticFolderId_abc"
+        phishing = [
+            f"https://docs.google.com/document/d/{doc}/../../../gview?url=https://evil.example/packet",
+            f"https://docs.google.com/document/d/{doc}/../../../url?q=https://evil.example/packet",
+            f"https://docs.google.com/document/d/{doc}/%2e%2e/%2e%2e/%2e%2e/gview?url=https://evil.example/packet",
+            f"https://docs.google.com/document/d/{doc}/./../../gview?url=https://evil.example/packet",
+            f"https://docs.google.com/document/d/{doc}/edit/../../../gview?url=https://evil.example/packet",
+            f"https://drive.google.com/file/d/{folder}/../../../gview?url=https://evil.example/packet",
+            f"https://drive.google.com/drive/folders/{folder}/../../../gview?url=https://evil.example/packet",
+            f"https://docs.google.com/document/d/{doc}/%252e%252e/%252e%252e/%252e%252e/gview?url=https://evil.example/packet",
+        ]
+        for url in phishing:
+            self.assertEqual(sanitize_drive_folder_url(url), "", msg=url)
+
     def test_rejects_userinfo_and_credential_host_tricks(self):
         # Built without a literal at-sign so the source is not flagged as an address.
         sep = chr(64)
