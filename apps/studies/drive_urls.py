@@ -32,6 +32,9 @@ _DRIVE_RESOURCE_PATH = re.compile(
     r")(/|$)",
     re.IGNORECASE,
 )
+# Same prefix as the /open|/folderview alternatives above, including a trailing
+# slash or extra path that .match() already accepts.
+_OPEN_OR_FOLDERVIEW_PATH = re.compile(r"^/(?:open|folderview)(?:/|$)", re.IGNORECASE)
 _DRIVE_ID = re.compile(r"^[A-Za-z0-9_-]+$")
 
 DRIVE_URL_HELP = (
@@ -68,7 +71,7 @@ def sanitize_drive_folder_url(url: str | None) -> str:
     if not _DRIVE_RESOURCE_PATH.match(path):
         return ""
 
-    if path.lower() in ("/open", "/folderview"):
+    if _OPEN_OR_FOLDERVIEW_PATH.match(path):
         folder_ids = parse_qs(parsed.query).get("id", [])
         if not folder_ids or not _DRIVE_ID.fullmatch(folder_ids[0]):
             return ""

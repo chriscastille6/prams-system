@@ -37,6 +37,34 @@ class DriveFolderUrlAllowlistTests(SimpleTestCase):
         self.assertEqual(sanitize_drive_folder_url(None), "")
         self.assertEqual(sanitize_drive_folder_url(123), "")
 
+    def test_open_and_folderview_require_resource_id_for_path_variants(self):
+        valid_id = "1SyntheticFolderId_abc"
+        accepted = (
+            f"https://drive.google.com/open?id={valid_id}",
+            f"https://drive.google.com/open/?id={valid_id}",
+            f"https://drive.google.com/folderview?id={valid_id}",
+            f"https://drive.google.com/folderview/?id={valid_id}",
+        )
+        for url in accepted:
+            self.assertEqual(sanitize_drive_folder_url(url), url, msg=url)
+
+        rejected = (
+            "https://drive.google.com/open",
+            "https://drive.google.com/open/",
+            "https://drive.google.com/open/extra",
+            "https://drive.google.com/open/?url=https://evil.example/packet",
+            "https://drive.google.com/open/extra?url=https://evil.example/packet",
+            "https://drive.google.com/folderview",
+            "https://drive.google.com/folderview/",
+            "https://drive.google.com/folderview/extra",
+            "https://drive.google.com/folderview/?url=https://evil.example/packet",
+            "https://drive.google.com/open?id=",
+            "https://drive.google.com/open/?id=",
+            "https://drive.google.com/open?id=not valid",
+        )
+        for url in rejected:
+            self.assertEqual(sanitize_drive_folder_url(url), "", msg=url)
+
     def test_rejects_non_drive_hosts_and_lookalikes(self):
         phishing = [
             "https://evil.example/drive/folders/1SyntheticFolderId_abc",
