@@ -8,6 +8,8 @@ from django.utils import timezone
 from django.conf import settings
 from django.core.validators import MinValueValidator
 
+from apps.studies.drive_urls import sanitize_drive_folder_url, validate_drive_folder_url
+
 
 class ActiveApprovedStudyManager(models.Manager):
     """
@@ -140,7 +142,11 @@ class Study(models.Model):
     # Nicholls Google Drive materials (Phase 1: deep link only; no file blobs in git)
     drive_folder_url = models.URLField(
         blank=True,
-        help_text="Nicholls Google Drive folder for study/protocol materials (packets, CITI, consents)",
+        validators=[validate_drive_folder_url],
+        help_text=(
+            "Nicholls Google Drive folder for study/protocol materials "
+            "(https drive.google.com / docs.google.com only)"
+        ),
     )
     drive_folder_id = models.CharField(
         max_length=128,
@@ -248,6 +254,11 @@ class Study(models.Model):
     def response_count(self):
         """Count total protocol responses."""
         return self.responses.count()
+
+    @property
+    def trusted_drive_folder_url(self):
+        """Drive materials href only when the stored URL is an allowlisted Drive/Docs link."""
+        return sanitize_drive_folder_url(self.drive_folder_url)
     
     @property
     def latest_irb_review(self):

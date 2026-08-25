@@ -124,10 +124,12 @@
                                 <a href="{% url 'studies:status' item.study.slug %}" class="btn btn-outline-primary btn-sm">
                                     View Live Study Status
                                 </a>
-                                {% if item.study.drive_folder_url %}
-                                <a href="{{ item.study.drive_folder_url }}" target="_blank" rel="noopener noreferrer" class="btn btn-outline-dark btn-sm">
+                                {% if item.study.trusted_drive_folder_url %}
+                                <a href="{{ item.study.trusted_drive_folder_url }}" target="_blank" rel="noopener noreferrer" class="btn btn-outline-dark btn-sm">
                                     Open materials in Google Drive
                                 </a>
+                                {% elif item.study.drive_folder_url %}
+                                <div class="small text-muted">Materials link is not a Google Drive URL and was hidden.</div>
                                 {% endif %}
                                 <a href="{% url 'studies:irb_review_history' item.study.id %}" class="btn btn-outline-secondary btn-sm">
                                     Review History
