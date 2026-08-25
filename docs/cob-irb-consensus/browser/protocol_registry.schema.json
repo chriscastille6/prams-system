@@ -15,7 +15,8 @@
     },
     "citi_folder_url": {
       "type": "string",
-      "description": "Nicholls Drive folder for investigator CITI PDFs (Confidential)."
+      "description": "Nicholls Drive folder for investigator CITI PDFs (Confidential). Runtime allowlist: https://drive.google.com/drive/folders/… only; other schemes or hosts are rejected.",
+      "pattern": "^https://drive\\.google\\.com/drive/(u/[0-9]+/)?folders/[A-Za-z0-9_-]+/?(\\?.*)?$"
     },
     "protocols": {
       "type": "array",

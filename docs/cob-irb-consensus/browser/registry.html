@@ -208,11 +208,24 @@
 
     <p class="source">Renewal: <strong>yellow</strong> ≤30 days; <strong>red</strong> overdue (not protected until renewed); <strong>green</strong> &gt;30 days. CITI: yellow ≤30 days; red missing/expired/not on Drive. Schema: <code>protocol_registry.schema.json</code>.</p>
   </main>
+  <script src="citi_folder_url.js"></script>
   <script>
 (function () {
   const RETENTION = "no_delete_update_only";
+  const citiFolder = window.CobIrbCitiFolder || {};
   const DEFAULT_CITI_FOLDER =
+    citiFolder.DEFAULT_CITI_FOLDER ||
     "https://drive.google.com/drive/folders/1JTJadjcEZEkOQwjSvsTkz2PcbOzqNFKi";
+  const parseAllowedCitiFolderUrl =
+    citiFolder.parseAllowedCitiFolderUrl ||
+    function () {
+      return null;
+    };
+  const safeCitiFolderUrl =
+    citiFolder.safeCitiFolderUrl ||
+    function () {
+      return DEFAULT_CITI_FOLDER;
+    };
 
   const today = () => {
     const d = new Date();
@@ -315,12 +328,19 @@
       .replace(/"/g, "&quot;");
   }
 
+  function applyCitiFolderLink(raw) {
+    const safe = safeCitiFolderUrl(raw);
+    el.openCitiFolder.setAttribute("href", safe);
+    el.openCitiFolder.setAttribute("rel", "noopener noreferrer");
+    el.openCitiFolder.setAttribute("target", "_blank");
+    return safe;
+  }
+
   function touchUpdated() {
     if (!registry) return;
     registry.updated_at = stamp();
     registry.retention_policy = RETENTION;
-    if (!registry.citi_folder_url) registry.citi_folder_url = DEFAULT_CITI_FOLDER;
-    el.openCitiFolder.href = registry.citi_folder_url || DEFAULT_CITI_FOLDER;
+    registry.citi_folder_url = applyCitiFolderLink(registry.citi_folder_url);
   }
 
   function appendLog(proto, summary, by) {
@@ -370,16 +390,20 @@
       alert("Invalid registry file. Expected version 1 with a protocols array.");
       return;
     }
+    const importedFolder = parseAllowedCitiFolderUrl(data.citi_folder_url);
+    const rejectedFolder =
+      data.citi_folder_url != null &&
+      String(data.citi_folder_url).trim() !== "" &&
+      !importedFolder;
     registry = {
       version: 1,
       updated_at: data.updated_at || stamp(),
       retention_policy: RETENTION,
-      citi_folder_url: data.citi_folder_url || DEFAULT_CITI_FOLDER,
+      citi_folder_url: applyCitiFolderLink(importedFolder || DEFAULT_CITI_FOLDER),
       protocols: data.protocols.map(normalizeProtocol),
     };
     el.exportBtn.disabled = false;
     el.exportSnapshotBtn.disabled = false;
-    el.openCitiFolder.href = registry.citi_folder_url;
     selectedHistoryIndex = null;
     el.historyBox.textContent = "Select History on a card.";
     el.citiRecheck.textContent = "Select a protocol and click “CITI recheck”.";
@@ -389,7 +413,10 @@
       registry.protocols.length +
       " protocol(s); updated_at " +
       registry.updated_at +
-      ". Retention: no delete.";
+      ". Retention: no delete." +
+      (rejectedFolder
+        ? " Rejected untrusted citi_folder_url (https://drive.google.com folder URLs only); using the default CITI folder."
+        : "");
     render();
   }
 
