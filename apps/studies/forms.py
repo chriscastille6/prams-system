@@ -19,6 +19,7 @@ class StudyForm(forms.ModelForm):
             'consent_text',
             'involves_deception',
             'is_active',
+            'drive_folder_url',
         ]
         widgets = {
             'title': forms.TextInput(attrs={
@@ -46,6 +47,10 @@ class StudyForm(forms.ModelForm):
             'is_classroom_based': forms.CheckboxInput(attrs={'class': 'form-check-input'}),
             'involves_deception': forms.CheckboxInput(attrs={'class': 'form-check-input'}),
             'is_active': forms.CheckboxInput(attrs={'class': 'form-check-input'}),
+            'drive_folder_url': forms.URLInput(attrs={
+                'class': 'form-control',
+                'placeholder': 'https://drive.google.com/drive/folders/...',
+            }),
         }
         labels = {
             'title': 'Study Title',
@@ -56,10 +61,12 @@ class StudyForm(forms.ModelForm):
             'is_classroom_based': 'Classroom-based study (not for general signup)',
             'involves_deception': 'Involves deception (requires IRB Chair review)',
             'is_active': 'Make study active (visible to participants)',
+            'drive_folder_url': 'Google Drive materials folder',
         }
         help_texts = {
             'is_classroom_based': 'Check if this study is only for students in a specific class',
             'involves_deception': 'Check if the study involves any form of deception',
+            'drive_folder_url': 'Nicholls Google Drive link for IRB packets / CITI (not stored in git)',
         }
 
 

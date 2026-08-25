@@ -7,7 +7,14 @@
     <div class="col-md-12">
         <div class="d-flex justify-content-between align-items-center mb-4">
             <h2>My Studies</h2>
-            <a href="{% url 'studies:create' %}" class="btn btn-success">Create New Study</a>
+            <div class="d-flex gap-2 flex-wrap">
+                {% if COB_HSIRB_DRIVE_ROOT_URL %}
+                <a href="{{ COB_HSIRB_DRIVE_ROOT_URL }}" target="_blank" rel="noopener noreferrer" class="btn btn-dark">
+                    CoB Drive materials
+                </a>
+                {% endif %}
+                <a href="{% url 'studies:create' %}" class="btn btn-success">Create New Study</a>
+            </div>
         </div>
 
         {% if citi_status %}
@@ -68,6 +75,13 @@
                                     {% elif study.irb_status != 'not_required' %}
                                         <span class="badge bg-info">IRB: {{ study.get_irb_status_display }}</span>
                                     {% endif %}
+                                    {% if study.irb_expiration_band == 'red' %}
+                                        <span class="badge bg-danger" title="Approval period lapsed — renew before continuing protected activity">Renewal overdue ({{ study.irb_expiration }})</span>
+                                    {% elif study.irb_expiration_band == 'yellow' %}
+                                        <span class="badge bg-warning text-dark" title="Within 30 days of renewal due">Renew by {{ study.irb_expiration }}</span>
+                                    {% elif study.irb_expiration_band == 'green' %}
+                                        <span class="badge bg-success">IRB through {{ study.irb_expiration }}</span>
+                                    {% endif %}
                                     {% if pending_amendment %}
                                         <span class="badge bg-warning text-dark">Addendum pending</span>
                                     {% endif %}
@@ -101,6 +115,13 @@
                                 <div class="d-flex flex-wrap gap-2 mb-2 align-items-center">
                                     <a href="{% url 'studies:status' study.slug %}" class="btn btn-outline-success btn-sm">Status</a>
                                     <a href="{% url 'studies:edit' study.id %}" class="btn btn-outline-secondary btn-sm">Edit</a>
+                                    {% if study.trusted_drive_folder_url %}
+                                    <a href="{{ study.trusted_drive_folder_url }}" target="_blank" rel="noopener noreferrer" class="btn btn-outline-dark btn-sm">
+                                        <i class="bi bi-folder2-open"></i> Open materials in Google Drive
+                                    </a>
+                                    {% elif study.drive_folder_url %}
+                                    <span class="small text-muted">Materials link is not a Google Drive URL and was hidden.</span>
+                                    {% endif %}
                                     {% if draft %}
                                     <a href="{% url 'studies:protocol_enter' study.id %}" class="btn btn-outline-info btn-sm">
                                         <i class="bi bi-file-earmark-text"></i> Edit Protocol (Draft)

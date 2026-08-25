@@ -1,0 +1,119 @@
+{
+  "version": 1,
+  "updated_at": "2026-08-12",
+  "retention_policy": "no_delete_update_only",
+  "citi_folder_url": "https://drive.google.com/drive/folders/1JTJadjcEZEkOQwjSvsTkz2PcbOzqNFKi",
+  "protocols": [
+    {
+      "protocol_id": "HSIRB-DEMO-001",
+      "short_title": "Synthetic workplace survey vignettes",
+      "study_context": "social_behavioral",
+      "approval_date": "2026-02-01",
+      "renewal_due_date": "2027-02-01",
+      "status": "active",
+      "pi_display": "A. Researcher",
+      "notes": "Synthetic demo — green renewal (>30 days).",
+      "investigators": [
+        {
+          "name_display": "A. Researcher",
+          "role": "pi",
+          "citi_on_drive": true,
+          "citi_expiration_date": "2027-06-01",
+          "citi_notes": "Synthetic — CITI valid"
+        }
+      ],
+      "change_log": [
+        {
+          "date": "2026-02-01",
+          "summary": "Initial approval recorded (synthetic).",
+          "by": "Demo Rep"
+        }
+      ]
+    },
+    {
+      "protocol_id": "HSIRB-DEMO-002",
+      "short_title": "Classroom SoTL feedback study",
+      "study_context": "social_behavioral",
+      "approval_date": "2025-10-15",
+      "renewal_due_date": "2026-09-05",
+      "status": "active",
+      "pi_display": "B. Faculty",
+      "notes": "Synthetic demo — yellow renewal (within 30 days of 2026-08-12).",
+      "investigators": [
+        {
+          "name_display": "B. Faculty",
+          "role": "pi",
+          "citi_on_drive": true,
+          "citi_expiration_date": "2026-09-01",
+          "citi_notes": "Synthetic — CITI expiring soon"
+        },
+        {
+          "name_display": "C. Co-I",
+          "role": "co_i",
+          "citi_on_drive": false,
+          "citi_expiration_date": null,
+          "citi_notes": "Synthetic — missing on Drive"
+        }
+      ],
+      "change_log": [
+        {
+          "date": "2025-10-15",
+          "summary": "Initial approval recorded (synthetic).",
+          "by": "Demo Rep"
+        }
+      ]
+    },
+    {
+      "protocol_id": "HSIRB-DEMO-003",
+      "short_title": "Archived pilot instrument check",
+      "study_context": "mixed_other",
+      "approval_date": "2024-01-10",
+      "renewal_due_date": "2025-01-10",
+      "status": "archived",
+      "pi_display": "C. Investigator",
+      "notes": "Synthetic archived — row retained.",
+      "investigators": [
+        {
+          "name_display": "C. Investigator",
+          "role": "pi",
+          "citi_on_drive": true,
+          "citi_expiration_date": "2025-12-01",
+          "citi_notes": ""
+        }
+      ],
+      "change_log": [
+        {
+          "date": "2025-02-01",
+          "summary": "Status set to archived — files retained on Drive.",
+          "by": "Demo Rep"
+        }
+      ]
+    },
+    {
+      "protocol_id": "HSIRB-DEMO-004",
+      "short_title": "Overdue continuing-review demo",
+      "study_context": "social_behavioral",
+      "approval_date": "2024-06-01",
+      "renewal_due_date": "2025-06-01",
+      "status": "active",
+      "pi_display": "D. Scholar",
+      "notes": "Synthetic demo — red renewal (overdue).",
+      "investigators": [
+        {
+          "name_display": "D. Scholar",
+          "role": "pi",
+          "citi_on_drive": true,
+          "citi_expiration_date": "2025-01-01",
+          "citi_notes": "Synthetic — CITI also expired"
+        }
+      ],
+      "change_log": [
+        {
+          "date": "2024-06-01",
+          "summary": "Initial approval recorded (synthetic).",
+          "by": "Demo Rep"
+        }
+      ]
+    }
+  ]
+}

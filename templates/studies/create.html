@@ -81,6 +81,15 @@
                             </small>
                         </div>
                         
+                        <div class="mb-3">
+                            <label for="id_drive_folder_url" class="form-label">{{ form.drive_folder_url.label }}</label>
+                            {{ form.drive_folder_url }}
+                            <small class="form-text text-muted">{{ form.drive_folder_url.help_text }}</small>
+                            {% if form.drive_folder_url.errors %}
+                                <div class="text-danger small">{{ form.drive_folder_url.errors.0 }}</div>
+                            {% endif %}
+                        </div>
+
                         <div class="card bg-light mb-3">
                             <div class="card-body">
                                 <h6 class="card-title">Study Options</h6>

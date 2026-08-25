@@ -15,6 +15,11 @@
         <div class="d-flex justify-content-between align-items-center mb-4">
             <h2>Your Assigned Protocols</h2>
             <div class="d-flex gap-2 flex-wrap">
+                {% if COB_HSIRB_DRIVE_ROOT_URL %}
+                <a href="{{ COB_HSIRB_DRIVE_ROOT_URL }}" target="_blank" rel="noopener noreferrer" class="btn btn-dark">
+                    CoB Drive materials
+                </a>
+                {% endif %}
                 <a href="{% url 'studies:social_science_irb_standards' %}" class="btn btn-outline-primary">
                     Social Science Standards
                 </a>
@@ -43,6 +48,17 @@
                             IRB Protocol #: {{ item.study.irb_number|default:"Pending" }}
                             &middot;
                             Status: <strong>{{ item.study.get_irb_status_display }}</strong>
+                            {% if item.study.irb_expiration %}
+                            &middot;
+                            Renewal:
+                            {% if item.study.irb_expiration_band == 'red' %}
+                            <span class="badge bg-danger">Overdue {{ item.study.irb_expiration }}</span>
+                            {% elif item.study.irb_expiration_band == 'yellow' %}
+                            <span class="badge bg-warning text-dark">Due {{ item.study.irb_expiration }}</span>
+                            {% else %}
+                            <span class="badge bg-success">{{ item.study.irb_expiration }}</span>
+                            {% endif %}
+                            {% endif %}
                         </div>
                     </div>
                     <div class="text-end">
@@ -108,6 +124,13 @@
                                 <a href="{% url 'studies:status' item.study.slug %}" class="btn btn-outline-primary btn-sm">
                                     View Live Study Status
                                 </a>
+                                {% if item.study.trusted_drive_folder_url %}
+                                <a href="{{ item.study.trusted_drive_folder_url }}" target="_blank" rel="noopener noreferrer" class="btn btn-outline-dark btn-sm">
+                                    Open materials in Google Drive
+                                </a>
+                                {% elif item.study.drive_folder_url %}
+                                <div class="small text-muted">Materials link is not a Google Drive URL and was hidden.</div>
+                                {% endif %}
                                 <a href="{% url 'studies:irb_review_history' item.study.id %}" class="btn btn-outline-secondary btn-sm">
                                     Review History
                                 </a>
