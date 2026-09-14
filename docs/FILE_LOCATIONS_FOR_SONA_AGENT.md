@@ -72,6 +72,12 @@ Once retired, do not collect or use new data for that vignette for the stopping-
 
 ---
 
+## Qualtrics Survey 1 UI fix (goals-refs / IRBE20260914-003CBA)
+
+Live Qualtrics is outside this repo. Step-by-step UI fixes for consent force-exit, disconnected Survey 2 end-of-survey, and Force Response:
+
+- `docs/goals-refs/QUALTRICS_SURVEY1_UI_FIX_RUNBOOK.md`
+
 ## Smoke test flow (goals-refs)
 
 Pretend smoke test for PI notifications (no live wiring). Run: `python3 manage.py smoke_test_goals_refs_emails` or `./venv/bin/python manage.py smoke_test_goals_refs_emails` (or activate venv first: `source venv/bin/activate` then `python manage.py smoke_test_goals_refs_emails`). Optional: `--output docs/smoke_test_goals_refs_emails.txt` to write to a file.
