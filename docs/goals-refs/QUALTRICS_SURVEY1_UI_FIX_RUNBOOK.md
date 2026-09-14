@@ -8,6 +8,20 @@
 
 ---
 
+## STATUS / recruiting gate
+
+**NOT READY TO RECRUIT.** Survey 1 is **not cleared**. Do **not** send faculty announcements or campus recruitment until Critical Qualtrics fixes are applied **live** and retested (**R1–R7** in this runbook).
+
+| Tracker | Link |
+|---------|------|
+| CoS Drive activity report (`goals-refs` folder) | https://drive.google.com/file/d/1iwnoD3rshpQ6ns0xL9qp4OtdRwfN4Pdo/view |
+| Faculty OS board | https://docs.google.com/document/d/163vnZGH_H8tfk98LN6zTBe52BS2wuyM7yEvWDnXa48I/edit |
+| Sibling status note (this PR) | [COS_STATUS.md](./COS_STATUS.md) |
+
+Fix steps below are unchanged; this section is the go/no-go gate only.
+
+---
+
 ## Scope and limits
 
 | Item | Status in this repo |
